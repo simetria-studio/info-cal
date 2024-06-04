@@ -1,30 +1,31 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CashPaymentController;
+use App\Http\Controllers\EnquiryController;
+use App\Http\Controllers\IodaPayController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EnquiryController;
-use App\Http\Controllers\Front\AboutUsController;
-use App\Http\Controllers\Front\BrandController;
 use App\Http\Controllers\Front\FaqController;
-use App\Http\Controllers\Front\FrontCMSController;
-use App\Http\Controllers\Front\FrontController;
-use App\Http\Controllers\Front\FrontTestimonialController;
 use App\Http\Controllers\Front\HomeController;
-use App\Http\Controllers\Front\MainReasonController;
-use App\Http\Controllers\Front\ServiceController;
-use App\Http\Controllers\Front\SubscribeController;
-use App\Http\Controllers\PersonalExperienceController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\SubscriptionPlansController;
-use App\Http\Controllers\SubscriptionTransactionController;
+use App\Http\Controllers\CashPaymentController;
+use App\Http\Controllers\Front\BrandController;
+use App\Http\Controllers\Front\FrontController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserProfileController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Front\AboutUsController;
+use App\Http\Controllers\Front\ServiceController;
+use App\Http\Controllers\Front\FrontCMSController;
+use App\Http\Controllers\Front\SubscribeController;
+use App\Http\Controllers\Front\MainReasonController;
+use App\Http\Controllers\SubscriptionPlansController;
+use App\Http\Controllers\PersonalExperienceController;
+use App\Http\Controllers\Front\FrontTestimonialController;
+use App\Http\Controllers\SubscriptionTransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -156,6 +157,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin', 'verified', 'checkCust
     Route::get('cash-payments', [CashPaymentController::class, 'index'])->name('cash.payments.index');
     Route::get('download-attachment/{mediaId}', [CashPaymentController::class, 'downloadAttachment'])->name('download.attachment');
 });
+
+Route::get('teste-iodapay', [IodaPayController::class, 'createPayment'])->name('create.payment');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/user.php';

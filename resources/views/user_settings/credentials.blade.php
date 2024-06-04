@@ -17,7 +17,7 @@
                                     {{ Form::hidden('sectionName','user_'.$sectionName) }}
                                     <div class="row mb-3">
                                         <div class="col-lg-1 col-form-label fw-bold fs-6">
-                                            {{ Form::label('stripe_enable', __('messages.setting.stripe'), ['class' => 'form-label ']) }}
+                                            {{ Form::label('stripe_enable', 'Iodapy', ['class' => 'form-label ']) }}
                                         </div>
                                         <div class="col-lg-8 mt-3">
                                             <div class="form-check form-switch col-6">
@@ -29,16 +29,16 @@
                                     </div>
                                     <div class="d-none user_stripe_div row">
                                         <div class="form-group col-sm-6 mb-5">
-                                            {{ Form::label('stripe_key', __('messages.setting.stripe_key').':', ['class' => 'form-label required ']) }}
+                                            {{ Form::label('stripe_key', 'public_key'.':', ['class' => 'form-label required ']) }}
                                             {{ Form::text('stripe_key', $setting['stripe_key'] ?? null, ['class' => 'form-control'  , 'placeholder' => __('messages.setting.stripe_key'), 'id' => 'UserStripeKey' ]) }}
                                         </div>
                                         <div class="form-group col-sm-6 mb-5">
-                                            {{ Form::label('stripe_secret', __('messages.setting.stripe_secret').':', ['class' => 'form-label required ']) }}
+                                            {{ Form::label('stripe_secret', 'private_key'.':', ['class' => 'form-label required ']) }}
                                             {{ Form::text('stripe_secret', $setting['stripe_secret'] ?? null, ['class' => 'form-control',  'placeholder' => __('messages.setting.stripe_secret') , 'id' =>'UserStripeSecret']) }}
                                         </div>
                                     </div>
                                     {{-- PAYPAL --}}
-                                    <div class="row mb-3">
+                                    {{-- <div class="row mb-3">
                                         <div class="col-lg-1 col-form-label fw-bold fs-6">
                                             {{ Form::label('paypal_enable', __('messages.setting.paypal'), ['class' => 'form-label ']) }}
                                         </div>
@@ -49,8 +49,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="d-none user_paypal_div row">
+                                    </div> --}}
+                                    {{-- <div class="d-none user_paypal_div row">
                                         <div class="form-group col-sm-6 mb-5">
                                             {{ Form::label('paypal_client_id', __('messages.setting.paypal_client_id').':', ['class' => 'form-label required ']) }}
                                             {{ Form::text('paypal_client_id', $setting['paypal_client_id'] ?? null, ['class' => 'form-control',  'placeholder' => __('messages.setting.paypal_client_id'), 'id' =>'UserPaypalClientId']) }}
@@ -63,7 +63,7 @@
                                             {{ Form::label('paypal_mode', __('messages.setting.paypal_mode').':', ['class' => 'form-label required ']) }}
                                             {{ Form::text('paypal_mode', $setting['paypal_mode'] ?? null, ['class' => 'form-control',  'placeholder' => __('messages.setting.paypal_mode') , 'id' => 'UserPaypalMode']) }}
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="card-footer d-flex pt-6 p-0">
                                     <button type="submit"

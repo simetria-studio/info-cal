@@ -140,8 +140,9 @@ class EventSchedule extends Model
     const PAYPAL = 2;
 
     const PAYMENT_METHOD = [
-        self::STRIPE => 'Stripe',
+        self::STRIPE => 'Iodapay',
         self::PAYPAL => 'Paypal',
+        
     ];
 
     /**

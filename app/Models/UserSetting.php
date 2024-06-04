@@ -11,12 +11,7 @@ use Illuminate\Support\Carbon;
 /**
  * App\Models\UserSetting
  *
- * @property int $id
- * @property int $user_id
- * @property string $key
- * @property string $value
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+
  *
  * @method static Builder|UserSetting newModelQuery()
  * @method static Builder|UserSetting newQuery()
@@ -39,6 +34,8 @@ class UserSetting extends Model
     public static $rules = [
         'key' => 'required',
         'value' => 'required',
+        'stripe_key' => 'required',
+        'stripe_secret' => 'required',
     ];
 
     /**
@@ -48,6 +45,8 @@ class UserSetting extends Model
         'user_id',
         'key',
         'value',
+        'stripe_key',
+        'stripe_secret',
     ];
 
     /**
@@ -57,5 +56,7 @@ class UserSetting extends Model
         'user_id' => 'integer',
         'key' => 'string',
         'value' => 'string',
+        'stripe_key' => 'string',
+        'stripe_secret' => 'string',
     ];
 }

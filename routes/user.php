@@ -121,6 +121,7 @@ Route::middleware(['xss', 'check_subscription', 'setCustomCalendarLang'])->group
         [EventController::class, 'slotDetail'])->name('slots.detail');
 
     Route::post('scheduled-events', [ScheduleEventController::class, 'store'])->name('scheduled-events.store');
+    Route::post('scheduled-events-create', [ScheduleEventController::class, 'createEvent'])->name('scheduled-events.create');
 
     // Confirm scheduled event route
     Route::get('sc/{domain_url}/{event_link}/{uuid}',

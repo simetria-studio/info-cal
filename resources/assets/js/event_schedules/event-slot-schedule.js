@@ -166,3 +166,80 @@ listenSubmit('#addEventSlotScheduleForm', function (e) {
         },
     });
 });
+
+
+listenSubmit('#createEventForm', function (e) {
+    e.preventDefault()
+    console.log('createEventForm');
+    let eventLocationArr = []
+    if (locationMeta[1] == 1) {
+        if ($('#phoneNumber').val() == '') {
+            $('#phoneNumber').focus()
+            displayErrorMessage(
+                Lang.get('js.phone_required'))
+            return false
+        }
+
+        eventLocationArr.push(eventLocation)
+        eventLocationArr.push(locationMeta[1])
+        eventLocationArr.push(
+            '+' + $('#prefix_code').val() + $('#phoneNumber').val())
+        $('#eventLocationPhoneCall').val(JSON.stringify(eventLocationArr))
+    }
+
+    paymentType = $('#slotPaymentType').val()
+    let btnSubmitEle = $(this).find('#slotPaymentSubmitBtn')
+    setBtnLoader(btnSubmitEle)
+
+    // $.ajax({
+    //     url: route('scheduled-events.create'),
+    //     type: 'POST',
+    //     data: $(this).serialize(),
+    //     success: function (result) {
+    //         if (result.success) {
+    //             let scheduleEventId = result.data.scheduleEventId
+    //             let confirmPageUrl = result.data.redirectUrl
+    //             if (result.data.eventType == Paid) {
+    //                 if (paymentType == 1) {       // stripe payment gateway
+    //                     let sessionId = result.data[0].sessionId
+    //                     stripe.redirectToCheckout({
+    //                         sessionId: sessionId,
+    //                     }).then(function (result) {
+    //                         manageAjaxErrors(result.message)
+    //                     })
+    //                 } else if (paymentType == 2) {  // Paypal payment gateway
+    //                     $.ajax({
+    //                         type: 'GET',
+    //                         url: route('paypal.init'),
+    //                         data: { 'scheduleEventId': scheduleEventId },
+    //                         success: function (result) {
+    //                             if (result.status == 'CREATED') {
+    //                                 let redirectTo = ''
+
+    //                                 $.each(result.links, function (key, val) {
+    //                                     if (val.rel == 'approve') {
+    //                                         redirectTo = val.href
+    //                                     }
+    //                                 })
+    //                                 location.href = redirectTo
+    //                             } else {
+    //                                 location.href = result.url
+    //                             }
+    //                         }
+    //                     })
+    //                 }
+    //             } else {
+    //                 $('#createEventForm')[0].reset()
+    //                 displaySuccessMessage(result.message)
+    //                 window.location.href = confirmPageUrl
+    //             }
+    //         }
+    //     },
+    //     error: function (result) {
+    //         displayErrorMessage(result.responseJSON.message);
+    //     },
+    //     complete: function () {
+    //         setBtnLoader(btnSubmitEle);
+    //     },
+    // });
+});

@@ -2,33 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateEventScheduleRequest;
-use App\Http\Requests\CreateVerifyOtpRequest;
-use App\Mail\CancelEventScheduleMail;
-use App\Mail\SendVerifyOtpMail;
-use App\Models\Event;
-use App\Models\EventSchedule;
-use App\Models\Transaction;
-use App\Models\User;
-use App\Repositories\ScheduleEventRepository;
-use Carbon\Carbon;
 use DateTime;
-use DateTimeZone;
 use Exception;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
+use DateTimeZone;
+use Carbon\Carbon;
+use Stripe\Stripe;
+use App\Models\User;
+use App\Models\Event;
+use Laracasts\Flash\Flash;
+use App\Models\Transaction;
+use App\Models\UserSetting;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Stripe\Checkout\Session;
+use App\Models\EventSchedule;
+use Spatie\CalendarLinks\Link;
+use App\Mail\SendVerifyOtpMail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
-use Laracasts\Flash\Flash;
-use Spatie\CalendarLinks\Link;
-use Stripe\Checkout\Session;
+use App\Mail\CancelEventScheduleMail;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\Factory;
 use Stripe\Exception\ApiErrorException;
-use Stripe\Stripe;
+use App\Http\Requests\CreateVerifyOtpRequest;
+use App\Repositories\ScheduleEventRepository;
+use Illuminate\Contracts\Foundation\Application;
+use App\Http\Requests\CreateEventScheduleRequest;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class ScheduleEventController extends AppBaseController
@@ -59,10 +61,49 @@ class ScheduleEventController extends AppBaseController
      *
      * @throws ApiErrorException
      */
+
+
+    public function createEvent(Request $request)
+    {
+        $input = $request->all();
+
+        $iodapay = new IodaPayController();
+        $userStripeSecret = UserSetting::whereUserId($input['user_id'])
+            ->where('key', '=', 'stripe_secret')->first();
+        $userStripePublic = UserSetting::whereUserId($input['user_id'])
+            ->where('key', '=', 'stripe_key')->first();
+
+        $event = Event::whereId($input['event_id'])->first();
+        $value = (string) $event->payable_amount; // Converte o valor para string
+        $reference = Str::random(6);
+        $cpf = str_replace(['.', '-'], '', $input['cpf']);
+
+        $payment = $iodapay->createPayment(
+            $userStripeSecret->value,
+            $userStripePublic->value,
+            $input['email'],
+            $cpf,
+            $input['name'],
+            'CPF',
+            $value, // Valor convertido para string
+            3600,
+            $reference
+        );
+
+        // Decodificando o corpo da resposta
+        $paymentResponse = json_decode($payment, true);
+
+        return response()->json($paymentResponse);
+    }
+
+
+
     public function store(CreateEventScheduleRequest $request): JsonResponse
     {
         $outData = [];
         $input = $request->all();
+
+        \Log::info('Event Schedule Input: ', $input);
 
         if (assignPlanFeatures($input['user_id'])->schedule_events <= getActiveScheduleEventsCount($input['user_id'])) {
             return $this->sendError(__('messages.success_message.schedule_events_upgrade'));
@@ -139,7 +180,7 @@ class ScheduleEventController extends AppBaseController
         $cancelScheduleEvent = $request->get('cancel');
         $eventSchedule = EventSchedule::with(['event', 'user', 'userGoogleEventSchedule'])->whereUuid($uuid)->first();
 
-        if (! $eventSchedule) {
+        if (!$eventSchedule) {
             abort(404);
         }
 
@@ -147,8 +188,8 @@ class ScheduleEventController extends AppBaseController
             User::TIME_ZONE_ARRAY[getLoginUser()->timezone] : User::TIME_ZONE_ARRAY[getTimeZone()];
         date_default_timezone_set($timeZone);
         $time = explode(' -', $eventSchedule->slot_time);
-        $startTime = Carbon::parse($eventSchedule->schedule_date.' '.$time[0])->format('Y-m-d H:i');
-        $endTime = Carbon::parse($eventSchedule->schedule_date.' '.$time[1])->format('Y-m-d H:i');
+        $startTime = Carbon::parse($eventSchedule->schedule_date . ' ' . $time[0])->format('Y-m-d H:i');
+        $endTime = Carbon::parse($eventSchedule->schedule_date . ' ' . $time[1])->format('Y-m-d H:i');
         $from = DateTime::createFromFormat('Y-m-d H:i', $startTime);
         $to = DateTime::createFromFormat('Y-m-d H:i', $endTime);
         $description = $event->eventSchedule->description ?? '';
@@ -157,8 +198,10 @@ class ScheduleEventController extends AppBaseController
             ->description($description);
         $downloadIcsFileLink = $link->ics();
 
-        return view('events.confirm_event_schedule',
-            compact('eventSchedule', 'downloadIcsFileLink', 'cancelScheduleEvent'));
+        return view(
+            'events.confirm_event_schedule',
+            compact('eventSchedule', 'downloadIcsFileLink', 'cancelScheduleEvent')
+        );
     }
 
     /**
@@ -168,7 +211,7 @@ class ScheduleEventController extends AppBaseController
     {
         $scheduledEventIds = EventSchedule::whereUserId(getLogInUserId())->pluck('id')->toArray();
 
-        if (! in_array($id, $scheduledEventIds)) {
+        if (!in_array($id, $scheduledEventIds)) {
             return $this->sendError(__('messages.schedule_event.this_schedule_event_can_not_be_cancelled'));
         }
 
@@ -253,8 +296,10 @@ class ScheduleEventController extends AppBaseController
 
         Flash::success(__('messages.success_message.otp_sent'));
 
-        return redirect(route('verify.otp.page',
-            [$eventSchedule->event->user->domain_url, $eventSchedule->event->event_link, $eventSchedule->uuid]));
+        return redirect(route(
+            'verify.otp.page',
+            [$eventSchedule->event->user->domain_url, $eventSchedule->event->event_link, $eventSchedule->uuid]
+        ));
     }
 
     /**
@@ -289,8 +334,10 @@ class ScheduleEventController extends AppBaseController
 
         Mail::to($data['email'])->send(new CancelEventScheduleMail($data));
 
-        return redirect(route('sc.cancel',
-            [$eventSchedule->event->user->domain_url, $eventSchedule->event->event_link, $eventSchedule->uuid]));
+        return redirect(route(
+            'sc.cancel',
+            [$eventSchedule->event->user->domain_url, $eventSchedule->event->event_link, $eventSchedule->uuid]
+        ));
     }
 
     /**
@@ -304,8 +351,8 @@ class ScheduleEventController extends AppBaseController
         $scheduleEvent = EventSchedule::with('user')->find($id);
         // $timezoneWiseTime = getTimezoneWiseUserSlotTime($scheduleEvent->user, $scheduleEvent->slot_time);
         $time = explode(' - ', $scheduleEvent->slot_time);
-        $startTime = Carbon::parse($scheduleEvent->schedule_date.' '.$time[0])->format('Y-m-d H:i');
-        $endTime = Carbon::parse($scheduleEvent->schedule_date.' '.$time[1])->format('Y-m-d H:i');
+        $startTime = Carbon::parse($scheduleEvent->schedule_date . ' ' . $time[0])->format('Y-m-d H:i');
+        $endTime = Carbon::parse($scheduleEvent->schedule_date . ' ' . $time[1])->format('Y-m-d H:i');
 
         $link = Link::create(
             $scheduleEvent->event->name,

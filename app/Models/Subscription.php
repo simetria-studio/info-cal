@@ -57,7 +57,7 @@ class Subscription extends Model
 
     const PAYMENT_TYPES = [
         self::TYPE_FREE => 'Free Plan',
-        self::TYPE_STRIPE => 'Stripe',
+        self::TYPE_STRIPE => 'iodapay',
         self::TYPE_PAYPAL => 'PayPal',
         self::MANUALLY => 'Manually',
     ];
