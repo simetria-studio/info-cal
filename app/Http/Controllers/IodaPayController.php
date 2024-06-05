@@ -53,7 +53,7 @@ class IodaPayController extends Controller
     {
         $data = $request->all();
 
-        \Log::info('Callback Notify:', $data);
+        \Log::info('Callback Notify:', $data['transactionId']);
 
         // if ($data['status'] == 'PAID') {
         //     $transaction = Transaction::where('transaction_id', $data['transactionId'])->first();

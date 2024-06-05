@@ -93,7 +93,7 @@ class ScheduleEventController extends AppBaseController
         // Decodificando o corpo da resposta
         $paymentResponse = json_decode($payment, true);
 
-        \Log::info('Payment Response: ', $paymentResponse);
+        // \Log::info('Payment Response: ', $paymentResponse);
 
         $transaction = Transaction::create([
             'user_id' => $input['user_id'],
@@ -128,7 +128,7 @@ class ScheduleEventController extends AppBaseController
         $outData = [];
         $input = $request->all();
 
-        \Log::info('Event Schedule Input: ', $input);
+        // \Log::info('Event Schedule Input: ', $input);
 
         if (assignPlanFeatures($input['user_id'])->schedule_events <= getActiveScheduleEventsCount($input['user_id'])) {
             return $this->sendError(__('messages.success_message.schedule_events_upgrade'));
