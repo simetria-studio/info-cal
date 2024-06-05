@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use GuzzleHttp\Client;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Models\EventSchedule;
 
 class IodaPayController extends Controller
 {
@@ -64,6 +65,17 @@ class IodaPayController extends Controller
             \Log::info('Callback Notify:', $data);
             \Log::info('Payment ID: ' . $paymentId);
             \Log::info('Status: ' . $status);
+
+            if ($status == 'COMPLETED') {
+                // Atualiza o status do pagamento no banco de dados
+                $transaction = Transaction::where('transaction_id', $paymentId)->first();
+                $transaction->status_pay = 1;
+                $transaction->save();
+
+                $schedule = EventSchedule::where('id', $transaction->schedule_event_id)->first();
+                $schedule->update(['status' => EventSchedule::HOLD]);
+
+            }
         } else {
             // Loga uma mensagem de erro se as chaves não existirem
             \Log::error('Chaves "paymentId" ou "status" não encontradas no callback.');
