@@ -55,6 +55,7 @@ class Transaction extends Model
         'amount',
         'meta',
         'type',
+        'status_pay',
     ];
 
     /**
@@ -67,6 +68,7 @@ class Transaction extends Model
         'amount' => 'double',
         'meta' => 'string',
         'type' => 'integer',
+        'status_pay' => 'integer',
     ];
 
     public function user(): BelongsTo

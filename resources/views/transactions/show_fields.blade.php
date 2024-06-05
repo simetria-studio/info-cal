@@ -18,13 +18,15 @@
                     <div class="row mb-7">
                         <label class="col-lg-4 fs-4 text-gray-600">{{ __('messages.schedule_event.amount') }}</label>
                         <div class="col-lg-8 fv-row">
-                            <span class="fs-4 text-gray-800">{{ getCurrencyIcon() }} {{ number_format($transaction->amount) }}</span>
+                            <span class="fs-4 text-gray-800">{{ getCurrencyIcon() }}
+                                {{ number_format($transaction->amount) }}</span>
                         </div>
                     </div>
                     <div class="row mb-7">
                         <label class="col-lg-4 fs-4 text-gray-600">{{ __('messages.schedule_event.date') }}</label>
                         <div class="col-lg-8 fv-row">
-                            <span class="fs-4 text-gray-800">{{ \Carbon\Carbon::parse($transaction->created_at)->translatedFormat('jS M, Y h:i A') }}</span>
+                            <span
+                                class="fs-4 text-gray-800">{{ \Carbon\Carbon::parse($transaction->created_at)->translatedFormat('jS M, Y h:i A') }}</span>
                         </div>
                     </div>
                     <div class="row mb-7">
@@ -34,27 +36,37 @@
                         </div>
                     </div>
                     <div class="row mb-7">
-                        <label class="col-lg-4 fs-4 text-gray-600">{{ __('messages.user_dashboard.schedule_date_time') }}</label>
+                        <label
+                            class="col-lg-4 fs-4 text-gray-600">{{ __('messages.user_dashboard.schedule_date_time') }}</label>
                         <div class="col-lg-8 fv-row">
                             <span class="badge bg-light-info">
-                                {{ $transaction->scheduleEvent->schedule_date }} {{ $transaction->scheduleEvent->slot_time }}
+                                {{ $transaction->scheduleEvent->schedule_date }}
+                                {{ $transaction->scheduleEvent->slot_time }}
                             </span>
                         </div>
                     </div>
                     <div class="row mb-7">
-                        <label class="col-lg-4 fs-4 text-gray-600">{{ __('messages.transaction.payment_status') }}</label>
+                        <label
+                            class="col-lg-4 fs-4 text-gray-600">{{ __('messages.transaction.payment_status') }}</label>
                         <div class="col-lg-8 fv-row">
-                            <span class="badge bg-light-success">{{ __('messages.transaction.paid') }}</span>
+                            @if ($transaction->status_pay == 1)
+                                <span class="badge bg-light-success">{{ __('messages.transaction.paid') }}</span>
+                            @else
+                                <span class="badge bg-light-danger">Pagamento pendente</span>
+                            @endif
+                            
                         </div>
                     </div>
                     <div class="row mb-7">
-                        <label class="col-lg-4 fs-4 text-gray-600">{{ __('messages.schedule_event.payment_type') }}</label>
+                        <label
+                            class="col-lg-4 fs-4 text-gray-600">{{ __('messages.schedule_event.payment_type') }}</label>
                         <div class="col-lg-8">
-                            @if($transaction->type == \App\Models\EventSchedule::STRIPE)
-                                <span class="badge bg-light-success">{{ 
-  \App\Models\EventSchedule::PAYMENT_METHOD[$transaction->type] }}</span>
+                            @if ($transaction->type == \App\Models\EventSchedule::STRIPE)
+                                <span
+                                    class="badge bg-light-success">{{ \App\Models\EventSchedule::PAYMENT_METHOD[$transaction->type] }}</span>
                             @else
-                                <span class="badge bg-light-primary">{{ \App\Models\EventSchedule::PAYMENT_METHOD[$transaction->type] }}</span>
+                                <span
+                                    class="badge bg-light-primary">{{ \App\Models\EventSchedule::PAYMENT_METHOD[$transaction->type] }}</span>
                             @endif
                         </div>
                     </div>
@@ -63,4 +75,3 @@
         </div>
     </div>
 </div>
-

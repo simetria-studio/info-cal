@@ -93,6 +93,31 @@ class ScheduleEventController extends AppBaseController
         // Decodificando o corpo da resposta
         $paymentResponse = json_decode($payment, true);
 
+        \Log::info('Payment Response: ', $paymentResponse);
+
+        $transaction = Transaction::create([
+            'user_id' => $input['user_id'],
+            'transaction_id' => $paymentResponse['transactionId'],
+            'amount' => $value,
+            'type' => 1,
+            'status_pay' => 0,
+            'schedule_event_id' => $input['event_id'], // Adicionando o ID do evento agendado
+            'meta' => json_encode($paymentResponse)
+        ]);
+
+        $bookedSlots = EventSchedule::whereEventId($input['event_id'])
+            ->whereDate('schedule_date', '=', $input['schedule_date'])
+            ->where('slot_time', '=', $input['slot_time'])
+            ->where('status', '!=', EventSchedule::CANCELLED)
+            ->pluck('slot_time')->toArray();
+
+        $eventSchedule = $this->scheduleEventRepo->store($input);
+
+        if ($bookedSlots) {
+            return $this->sendError('This Event schedule is already booked.');
+        }
+
+
         return response()->json($paymentResponse);
     }
 
