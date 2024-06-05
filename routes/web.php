@@ -159,6 +159,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin', 'verified', 'checkCust
 });
 
 Route::get('teste-iodapay', [IodaPayController::class, 'createPayment'])->name('create.payment');
+Route::post('callback', [IodaPayController::class, 'callbackNotify'])->name('callback.notify');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/user.php';
