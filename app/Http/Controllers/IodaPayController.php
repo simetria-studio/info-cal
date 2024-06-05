@@ -51,21 +51,29 @@ class IodaPayController extends Controller
     }
     public function callbackNotify(Request $request)
     {
+        // Obtém todos os dados da requisição
         $data = $request->all();
-
+    
+        // Decodifica o JSON contido na chave 'data'
         $data = json_decode($data['data'], true);
-
-        \Log::info('Callback Notify:', $data);
-
-        // if ($data['status'] == 'PAID') {
-        //     $transaction = Transaction::where('transaction_id', $data['transactionId'])->first();
-
-        //     if ($transaction) {
-        //         $transaction->status_pay = 'PAID';
-        //         $transaction->save();
-        //     }
-        // }
-
+    
+        // Verifica se os dados contêm as chaves 'paymentId' e 'status'
+        if (isset($data['paymentId']) && isset($data['status'])) {
+            // Extrai o paymentId e o status
+            $paymentId = $data['paymentId'];
+            $status = $data['status'];
+    
+            // Loga os valores
+            \Log::info('Callback Notify:', $data);
+            \Log::info('Payment ID: ' . $paymentId);
+            \Log::info('Status: ' . $status);
+        } else {
+            // Loga uma mensagem de erro se as chaves não existirem
+            \Log::error('Chaves "paymentId" ou "status" não encontradas no callback.');
+        }
+    
+        // Retorna a resposta JSON
         return response()->json(['status' => 'OK']);
     }
+    
 }
