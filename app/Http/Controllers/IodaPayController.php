@@ -53,16 +53,13 @@ class IodaPayController extends Controller
     {
         // Obtém todos os dados da requisição
         $data = $request->all();
-    
-        // Decodifica o JSON contido na chave 'data'
-        $data = json_decode($data['data'], true);
-    
+
         // Verifica se os dados contêm as chaves 'paymentId' e 'status'
         if (isset($data['paymentId']) && isset($data['status'])) {
             // Extrai o paymentId e o status
             $paymentId = $data['paymentId'];
             $status = $data['status'];
-    
+
             // Loga os valores
             \Log::info('Callback Notify:', $data);
             \Log::info('Payment ID: ' . $paymentId);
@@ -71,9 +68,8 @@ class IodaPayController extends Controller
             // Loga uma mensagem de erro se as chaves não existirem
             \Log::error('Chaves "paymentId" ou "status" não encontradas no callback.');
         }
-    
+
         // Retorna a resposta JSON
         return response()->json(['status' => 'OK']);
     }
-    
 }
