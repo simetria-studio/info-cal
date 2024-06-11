@@ -116,6 +116,7 @@
                                                     @endif
                                                 @endif
                                             @endif
+                                            {{ Form::tel('phone_call', null, ['class' => 'form-control', 'onkeyup' => 'if (/\D/g.test(this.value)) this.value = this.value.replace(/\D/g,"")', 'id' => 'phoneNumber']) }}
                                             @if ($event->event_type == \App\Models\Event::PAID && $event->payable_amount != 0)
                                                 <div class="mb-5">
                                                     {{ Form::label('payment_type', __('messages.schedule_event.payment_type') . ':', ['class' => 'required form-label']) }}
